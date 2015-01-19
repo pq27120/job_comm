@@ -2,10 +2,6 @@
 import sys
 from PyQt4 import QtGui, QtCore
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-
 class file_dialog(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -14,25 +10,35 @@ class file_dialog(QtGui.QDialog):
         # 表格布局，用来布局QLabel和QLineEdit及QSpinBox
         grid = QtGui.QGridLayout()
 
+        layout0 = QtGui.QHBoxLayout()
+        label0 = QtGui.QLabel('列表文件', parent=self)
+        layout0.addWidget(label0)
+        self.leName0 = QtGui.QLineEdit(parent=self)
+        layout0.addWidget(self.leName0)
+        btn0 = QtGui.QPushButton('选择', parent=self)
+        btn0.clicked.connect(self.select_list_file)
+        layout0.addWidget(btn0)
+        grid.addLayout(layout0, 0, 1, 1, 1)
+
         layout = QtGui.QHBoxLayout()
-        label = QtGui.QLabel(u'源文件夹', parent=self)
+        label = QtGui.QLabel('源文件夹', parent=self)
         layout.addWidget(label)
         self.leName = QtGui.QLineEdit(parent=self)
         layout.addWidget(self.leName)
-        btn1 = QtGui.QPushButton(u'选择', parent=self)
+        btn1 = QtGui.QPushButton('选择', parent=self)
         btn1.clicked.connect(self.select_source_dir)
         layout.addWidget(btn1)
-        grid.addLayout(layout, 0, 1, 1, 1)
+        grid.addLayout(layout, 1, 1, 1, 1)
 
         layout1 = QtGui.QHBoxLayout()
-        label1 = QtGui.QLabel(u'目标文件夹', parent=self)
+        label1 = QtGui.QLabel('目标文件夹', parent=self)
         layout1.addWidget(label1)
         self.leName1 = QtGui.QLineEdit(parent=self)
         layout1.addWidget(self.leName1)
-        btn2 = QtGui.QPushButton(u'选择', parent=self)
+        btn2 = QtGui.QPushButton('选择', parent=self)
         btn2.clicked.connect(self.select_dest_dir)
         layout1.addWidget(btn2)
-        grid.addLayout(layout1, 1, 1, 1, 1)
+        grid.addLayout(layout1, 2, 1, 1, 1)
 
         # 创建ButtonBox，用户确定和取消
         button_box = QtGui.QDialogButtonBox(parent=self)
@@ -68,6 +74,12 @@ class file_dialog(QtGui.QDialog):
 
     def select_dest_dir(self):
         self.leName1.setText(QtGui.QFileDialog.getExistingDirectory())
+
+    def select_list_file(self):
+        self.leName0.setText(QtGui.QFileDialog.getOpenFileName())
+
+    def list_file(self):
+        return self.leName0.text()
 
 
 if __name__ == '__main__':

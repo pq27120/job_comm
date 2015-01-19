@@ -2,10 +2,6 @@
 import sys
 from PyQt4 import QtGui, QtCore
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-
 class Dialog(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)
@@ -14,12 +10,12 @@ class Dialog(QtGui.QDialog):
         # 表格布局，用来布局QLabel和QLineEdit及QSpinBox
         grid = QtGui.QGridLayout()
 
-        grid.addWidget(QtGui.QLabel(u'表名', parent=self), 0, 0, 1, 1)
+        grid.addWidget(QtGui.QLabel('表名', parent=self), 0, 0, 1, 1)
 
         self.leName = QtGui.QLineEdit(parent=self)
         grid.addWidget(self.leName, 0, 1, 1, 1)
 
-        grid.addWidget(QtGui.QLabel(u'sql类型', parent=self), 1, 0, 1, 1)
+        grid.addWidget(QtGui.QLabel('sql类型', parent=self), 1, 0, 1, 1)
 
         self.my_combo = QtGui.QComboBox(parent=self)
         self.my_combo.addItem('select')

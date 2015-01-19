@@ -1,20 +1,15 @@
 # coding=utf-8
-from Dialog import Dialog
 import os
 
 import sys
 import shutil
-from PyQt4.uic.properties import QtCore
+from tkinter.dialog import Dialog
 from dialog.jdbc_edit_dialog import jdbc_edit_dialog
 from file_dialog import file_dialog
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-import socket, cx_Oracle
+import socket,cx_Oracle
 from PyQt4 import QtGui
-import ConfigParser
-import decimal
-
+import configparser
 
 class Frame(QtGui.QWidget):
     def __init__(self, parent=None):
@@ -23,7 +18,7 @@ class Frame(QtGui.QWidget):
         layout = QtGui.QVBoxLayout()
         toolBar = QtGui.QToolBar()
         simpleButton = QtGui.QToolButton()
-        simpleButton.setText(u'贵州')
+        simpleButton.setText('贵州')
         simpleButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
         simpleButton.setMenu(self.pop_file_menu())
         toolBar.addWidget(simpleButton)
@@ -31,16 +26,16 @@ class Frame(QtGui.QWidget):
 
         self.menu_bar = QtGui.QMenuBar()
         menu = QtGui.QMenu()
-        menu.setTitle(u'贵州')
+        menu.setTitle('贵州')
         action = QtGui.QAction(self)
-        action.setText(u'IP限制')
+        action.setText('IP限制')
         menu.addAction(action)
         self.menu_bar.addMenu(menu)
 
         # 创建table和model
         self.table = QtGui.QTableView(parent=self)
         self.model = QtGui.QStandardItemModel(parent=self)
-        self.model.setHorizontalHeaderLabels([u'返回值'])
+        self.model.setHorizontalHeaderLabels(['返回值'])
         self.table.setModel(self.model)
 
         # 创建一个垂直布局，用于防止表格和按钮
@@ -49,10 +44,10 @@ class Frame(QtGui.QWidget):
 
     def pop_file_menu(self):
         aMenu = QtGui.QMenu(self)
-        aMenu.addAction(QtGui.QAction(u'ip添加', self, triggered=self.button_one_clicked))
-        aMenu.addAction(QtGui.QAction(u'sql生成', self, triggered=self.show_dialog))
-        aMenu.addAction(QtGui.QAction(u'增量包', self, triggered=self.create_war))
-        aMenu.addAction(QtGui.QAction(u'jdbc修改', self, triggered=self.jdbc_edit))
+        aMenu.addAction(QtGui.QAction('ip添加', self, triggered=self.button_one_clicked))
+        aMenu.addAction(QtGui.QAction('sql生成', self, triggered=self.show_dialog))
+        aMenu.addAction(QtGui.QAction('增量包', self, triggered=self.create_war))
+        aMenu.addAction(QtGui.QAction('jdbc修改', self, triggered=self.jdbc_edit))
         return aMenu
 
     def show_dialog(self):
@@ -70,7 +65,7 @@ class Frame(QtGui.QWidget):
 
     def create_sql(self, input_name, sql_type):
         # print input_name
-        conf = ConfigParser.ConfigParser()
+        conf = configparser.ConfigParser()
         conf.read(os.getcwd() + '/config/jdbc.cfg')
         conn = cx_Oracle.connect(conf.get('gz_oracle', 'username'),
                                  conf.get('gz_oracle', 'password'),
@@ -92,7 +87,7 @@ class Frame(QtGui.QWidget):
             if self.model.rowCount() > 0:
                 self.model.removeRow(self.model.rowCount() - 1)
             self.model.appendRow((
-                QtGui.QStandardItem(u'成功！')
+                QtGui.QStandardItem('成功！')
             ))
             self.table.resizeColumnsToContents()  # 将列调整到跟内容大小相匹配
         dialog.destroy()
@@ -100,8 +95,10 @@ class Frame(QtGui.QWidget):
     def button_one_clicked(self):
         local_ip = socket.gethostbyname(socket.gethostname())
         # print "local ip:%s " % local_ip
-        conf = ConfigParser.ConfigParser()
+        conf = configparser.ConfigParser()
         conf.read(os.getcwd() + '/config/jdbc.cfg')
+        print(conf.get('gz_oracle', 'username'))
+        print(conf.get('gz_oracle', 'sid'))
         conn = cx_Oracle.connect(conf.get('gz_oracle', 'username'),
                                  conf.get('gz_oracle', 'password'),
                                  conf.get('gz_oracle', 'server') + ':'
@@ -120,7 +117,7 @@ class Frame(QtGui.QWidget):
         if self.model.rowCount() > 0:
             self.model.removeRow(self.model.rowCount() - 1)
         self.model.appendRow((
-            QtGui.QStandardItem(u'IP插入成功！')
+            QtGui.QStandardItem('IP插入成功！')
         ))
         self.table.resizeColumnsToContents()  # 将列调整到跟内容大小相匹配
 
@@ -130,7 +127,7 @@ class Frame(QtGui.QWidget):
         if dialog.exec_():
             # print dialog.source_dir()
             # print dialog.dest_dir()
-            result = self.list_file(str(dialog.source_dir())+'/', str(dialog.dest_dir())+'/')
+            result = self.list_file(str(dialog.list_file()), str(dialog.source_dir())+'/', str(dialog.dest_dir())+'/')
             if self.model.rowCount() > 0:
                 self.model.removeRow(self.model.rowCount() - 1)
             self.model.appendRow((
@@ -140,23 +137,36 @@ class Frame(QtGui.QWidget):
         dialog.destroy()
 
 
-    def list_file(self, source_dir, target_dir):
-        f = open("config/filelist.txt")
+    def list_file(self, list_file, source_dir, target_dir):
+        f = open(list_file)
         line = f.readline()
         while line:
             self.copy_files(source_dir, target_dir, line.strip('\n'))
             line = f.readline()
         f.close()
-        return u'成功'
+        return '成功'
 
 
-    def copy_files(self, sourcedir, targetdir, file):
-        source_file = os.path.join(sourcedir, file)
-        target_file = os.path.join(targetdir, file)
-        if not os.path.exists(targetdir + os.path.dirname(file)):
-            os.makedirs(targetdir + os.path.dirname(file))
-        if os.path.isfile(sourcedir + file):
-            shutil.copyfile(source_file, target_file)
+    def copy_files(self, sourcedir, targetdir, line):
+        if line.startswith('gzshop_dev'):
+            line = line.replace('gzshop_dev\\src\\java\\main', 'gzshop_dev\\web\\WEB-INF\\classes')
+            line = line.replace('gzshop_dev\\src\\java\\resources', 'gzshop_dev\\web\\WEB-INF\\classes')
+            line = line.replace('.java', '.class')
+        elif line.startswith('html_dev'):
+            line = line.replace('html_dev\\src\\java\\main', 'html_dev\\web\\WEB-INF\\classes')
+            line = line.replace('html_dev\\src\\main\\resources', 'html_dev\\web\\WEB-INF\\classes')
+            line = line.replace('.java', '.class')
+        elif line.startswith('mallcms_dev'):
+            line = line.replace('mallcms_dev\\src', 'mallcms_dev\\web\\WEB-INF\\classes')
+            line = line.replace('mallcms_dev\\etc\\common', 'mallcms_dev\\web\\WEB-INF\\classes')
+            line = line.replace('.java', '.class')
+
+        source_file = os.path.join(sourcedir, line)
+        target_file = os.path.join(targetdir, line)
+        if not os.path.exists(targetdir + os.path.dirname(line)):
+             os.makedirs(targetdir + os.path.dirname(line))
+        if os.path.isfile(sourcedir + line):
+             shutil.copyfile(source_file, target_file)
 
     def create_select(self, input_name, cursor):
         sql = 'select '

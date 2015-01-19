@@ -1,14 +1,12 @@
-# coding=utf-8
-
-import ConfigParser
-from ipaddress import ip_network
-
-import sys, os
-from PyQt4 import QtCore, QtGui
-class AddressBook(QtGui.QWidget):
-    def __init__(self, parent=None):
-        print os.getcwd();
-
-
-if __name__ == '__main__':
-    addressBook = AddressBook()
+__author__ = 'pq'
+#!encoding:utf-8
+import sys
+from cx_Freeze import setup, Executable
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"
+setup(
+        name = "工具合集",
+        version = "1",
+        description = "工具合集",
+        executables =[Executable ("frame.py", base = base,icon="images.ico")])
